@@ -25,28 +25,29 @@ def preproc_ocn_wv(ds):
         pass
     newds = xarray.Dataset()
     # format data for CWAVE 22 params computation
-    cspcRe = ds['oswQualityCrossSpectraRe'].values.squeeze()
-    cspcIm = ds['oswQualityCrossSpectraIm'].values.squeeze()
+    cspc_re = ds['oswQualityCrossSpectraRe'].values.squeeze()
+    cspc_im = ds['oswQualityCrossSpectraIm'].values.squeeze()
     ths1 = np.arange(0, 360, 5)
     ks1 = patch_osw_k(ds['oswK'].values.squeeze(), ipfvesion=None, datedtsar=fdatedt)
-    if cspcRe.shape == (36, 30):
-        cspcRe = np.zeros((72, 60))
-        cspcIm = np.zeros((72, 60))
+    if cspc_re.shape == (36, 30):
+        cspc_re = np.zeros((72, 60))
+        cspc_im = np.zeros((72, 60))
         ks1 = reference_oswK_1145m_60pts  # we decided to not give predictions for spectra with a shape 36 30
 
     ta = ds['oswHeading'].values.squeeze()
     incidenceangle = ds['oswIncidenceAngle'].values.squeeze()
     s0 = ds['oswNrcs'].values.squeeze()
     nv = ds['oswNv'].values.squeeze()
-    lonSAR = ds['oswLon'].values.squeeze()
-    latSAR = ds['oswLat'].values.squeeze()
+    lon_sar = ds['oswLon'].values.squeeze()
+    lat_sar = ds['oswLat'].values.squeeze()
     satellite = os.path.basename(filee)[0:3]
-    subset_ok, flagKcorrupted, cspcReX, cspcImX, _, ks1, ths1, kx, ky, \
-    cspcReX_not_conservativ, S = format_input_cwave_vector_from_ocn(cspc_re=cspcRe.T,
-                                                                    cspc_im=cspcIm.T, ths1=ths1, ta=ta,
-                                                                    incidenceangle=incidenceangle,
-                                                                    s0=s0, nv=nv, ks1=ks1, datedt=fdatedt,
-                                                                    lons=lonSAR, lats=latSAR, satellite=satellite)
+    subset_ok, flag_k_corrupted, cspc_re_x, cspc_im_x, _, ks1, ths1, kx, ky, \
+        cspc_re_x_not_conservativ, s = format_input_cwave_vector_from_ocn(cspc_re=cspc_re.T,
+                                                                          cspc_im=cspc_im.T, ths1=ths1, ta=ta,
+                                                                          incidenceangle=incidenceangle,
+                                                                          s0=s0, nv=nv, ks1=ks1, datedt=fdatedt,
+                                                                          lons=lon_sar, lats=lat_sar,
+                                                                          satellite=satellite)
     varstoadd = ['S', 'cwave', 'dxdt', 'latlonSARcossin', 'todSAR',
                  'incidence', 'incidence_angle', 'satellite', 'oswQualityCrossSpectraRe', 'oswQualityCrossSpectraIm']
     additional_vars_for_validation = ['oswLon', 'oswLat', 'oswLandFlag', 'oswIncidenceAngle', 'oswWindSpeed',
@@ -61,13 +62,13 @@ def preproc_ocn_wv(ds):
         if vv in ['cwave']:
             dimszi = ['time', 'cwavedim']
             coordi = {'time': [fdatedt], 'cwavedim': np.arange(22)}
-            cwave = np.hstack([S.T, s0.reshape(-1, 1), nv.reshape(-1, 1)])  # found L77 in preprocess.py
+            cwave = np.hstack([s.T, s0.reshape(-1, 1), nv.reshape(-1, 1)])  # found L77 in preprocess.py
             cwave = preprocess.conv_cwave(cwave)
             newds[vv] = xarray.DataArray(data=cwave, dims=dimszi, coords=coordi)
         elif vv == 'S':  # to ease the comparison with Justin files
             dimszi = ['time', 'Sdim']
             coordi = {'time': [fdatedt], 'Sdim': np.arange(20)}
-            newds[vv] = xarray.DataArray(data=S.T, dims=dimszi, coords=coordi)
+            newds[vv] = xarray.DataArray(data=s.T, dims=dimszi, coords=coordi)
         elif vv in ['dxdt']:
             # dx and dt and delta from coloc with alti see /home/cercache/users/jstopa/sar/empHs/cwaveV5,
             # I can put zeros here at this stage
@@ -78,12 +79,12 @@ def preproc_ocn_wv(ds):
             coordi = {'time': [fdatedt], 'dxdtdim': np.arange(2)}
             newds[vv] = xarray.DataArray(data=dxdt, dims=dimszi, coords=coordi)
         elif vv in ['latlonSARcossin']:
-            latSARcossin = preprocess.conv_position(subset_ok['latSAR'])  # Gets cos and sin
-            lonSARcossin = preprocess.conv_position(subset_ok['lonSAR'])
-            latlonSARcossin = np.hstack([latSARcossin, lonSARcossin])
+            lat_sar_cossin = preprocess.conv_position(subset_ok['latSAR'])  # Gets cos and sin
+            lon_sar_cossin = preprocess.conv_position(subset_ok['lonSAR'])
+            latlon_sar_cossin = np.hstack([lat_sar_cossin, lon_sar_cossin])
             dimszi = ['time', 'latlondim']
             coordi = {'time': [fdatedt], 'latlondim': np.arange(4)}
-            newds[vv] = xarray.DataArray(data=latlonSARcossin, dims=dimszi, coords=coordi)
+            newds[vv] = xarray.DataArray(data=latlon_sar_cossin, dims=dimszi, coords=coordi)
         elif vv in ['todSAR']:
             dimszi = ['time']
             coordi = {'time': [fdatedt]}
@@ -130,13 +131,13 @@ def preproc_ocn_wv(ds):
             newds[vv] = xarray.DataArray(data=nv.reshape((1,)), dims=dimszi, coords=coordi)
         elif vv in ['oswQualityCrossSpectraRe', 'oswQualityCrossSpectraIm']:
             if vv == 'oswQualityCrossSpectraRe':
-                datatmp = cspcRe
+                datatmp = cspc_re
             elif vv == 'oswQualityCrossSpectraIm':
-                datatmp = cspcIm
+                datatmp = cspc_im
             else:
                 raise Exception()
 
-            coordi = {}
+            coordi = dict()
             coordi['time'] = [fdatedt]
             coordi['oswAngularBinSize'] = np.arange(len(ths1))
             coordi['oswWavenumberBinSize'] = np.arange(len(ks1))
@@ -148,7 +149,7 @@ def preproc_ocn_wv(ds):
         else:
             datatmp = ds[vv].values.squeeze()
             olddims = [x for x in ds[vv].dims if x not in ['oswAzSize', 'oswRaSize']]
-            coordi = {}
+            coordi = dict()
             for didi in olddims:
                 coordi[didi] = ds[vv].coords[didi].values
             coordi['time'] = [fdatedt]

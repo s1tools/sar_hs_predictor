@@ -2,7 +2,8 @@
 copy paste from compute_hs_total_SAR_v2.py 31 January 2021
 
 v2 is copy/paste from v1c, it is a CWAVE algo python that use the polSpec from OCN products,
-it extracts the 20 param and use a CWAVE v2 model tuned on altimeters (only numpy dependencies) provided by Yannick Glaser (University of Hawaii)
+it extracts the 20 param and use a CWAVE v2 model tuned on altimeters (only numpy dependencies) provided by
+Yannick Glaser (University of Hawaii)
 date creation: 9 July 2019
 
 C-WAVE params consist in 20 values computed from  Sentinel-1 C-band SAR WV image cross spectra
@@ -86,7 +87,7 @@ def format_input_cwave_vector_from_ocn(cspc_re, cspc_im, ths1, ta, incidenceangl
     DKX = np.ones(KX.shape) * 0.003513732113299
     DKY = np.ones(KX.shape) * 0.002954987953815
 
-    flagKcorrupted = (ks1 > 1000).any()
+    flag_kcorrupted = (ks1 > 1000).any()
 
     subset_ok = dict()
     subset_ok['todSAR'] = _conv_time(netCDF4.date2num(datedt, 'hours since 2010-01-01T00:00:00Z UTC'))
@@ -108,13 +109,13 @@ def format_input_cwave_vector_from_ocn(cspc_re, cspc_im, ths1, ta, incidenceangl
         #         interpmethod = 'nearest' #D max diff 25 too smooth but worst hs 0.14m diff
         #         interpmethod = 'cubic' #D max diff 28 too smooth but worst hs 0.05m diff
 
-        cspcReX, cspcReX_not_conservativ = pol_cart_trans(d=cspc_re[:, idd], k=ks1, t=np.radians(ths1), x=kx, y=ky,
-                                                          name='re', interpmethod=interpmethod)
-        assert cspcReX.shape == (71, 85)  # or cspcReX.shape==(85,71) #info de justin
-        cspcImX, cspcImX_not_conservativ = pol_cart_trans(d=cspc_im[:, idd], k=ks1, t=np.radians(ths1), x=kx, y=ky,
-                                                          name='im', interpmethod=interpmethod)
+        cspc_re_x, cspc_re_x_not_conservativ = pol_cart_trans(d=cspc_re[:, idd], k=ks1, t=np.radians(ths1), x=kx, y=ky,
+                                                              name='re', interpmethod=interpmethod)
+        assert cspc_re_x.shape == (71, 85)  # or cspcReX.shape==(85,71) #info de justin
+        cspc_im_x, cspc_im_x_not_conservativ = pol_cart_trans(d=cspc_im[:, idd], k=ks1, t=np.radians(ths1), x=kx, y=ky,
+                                                              name='im', interpmethod=interpmethod)
 
-        cspc = np.sqrt(cspcReX ** 2 + cspcImX ** 2)
+        cspc = np.sqrt(cspc_re_x ** 2 + cspc_im_x ** 2)
 
         cspc = cspc[gdx, gdy]
         cspc = np.reshape(cspc, (len(uniq_gdx), len(uniq_gdy)))
@@ -174,24 +175,24 @@ def format_input_cwave_vector_from_ocn(cspc_re, cspc_im, ths1, ta, incidenceangl
         h[:, :, 19] = g4 * f5 * eta
 
         try:
-            P = cspc / (np.nansum(np.nansum(cspc * DKX * DKY)))  # original
+            p = cspc / (np.nansum(np.nansum(cspc * DKX * DKY)))  # original
         except:
-            P = np.array([1])  # trick to return something but not usable
-            flagKcorrupted = True
+            p = np.array([1])  # trick to return something but not usable
+            flag_kcorrupted = True
 
         if not np.isfinite(s0) or isinstance(s0, np.ma.core.MaskedConstant):  # or s0.mask.all():
             s0 = 0
-            flagKcorrupted = True
+            flag_kcorrupted = True
         if not np.isfinite(nv) or isinstance(nv, np.ma.core.MaskedConstant):  # or nv.mask.all():
             nv = 0
-            flagKcorrupted = True
+            flag_kcorrupted = True
         if not np.isfinite(incidenceangle) or isinstance(incidenceangle,
                                                          np.ma.core.MaskedConstant):  # or incidenceangle.mask.all():
-            flagKcorrupted = True
+            flag_kcorrupted = True
 
         for jj in range(ns):
             petit_h = h[:, :, jj].squeeze().T
-            S[jj] = np.nansum(np.nansum(petit_h * P.T * DKX.T * DKY.T))
+            S[jj] = np.nansum(np.nansum(petit_h * p.T * DKX.T * DKY.T))
 
         for iiu in range(len(S)):
             subset_ok['s' + str(iiu)] = S[iiu][0]
@@ -205,11 +206,11 @@ def format_input_cwave_vector_from_ocn(cspc_re, cspc_im, ths1, ta, incidenceangl
         except:
             pass
     else:
-        cspcReX = np.zeros((71, 85))
-        cspcImX = np.zeros((71, 85))
-        cspcReX_not_conservativ = np.zeros((71, 85))
+        cspc_re_x = np.zeros((71, 85))
+        cspc_im_x = np.zeros((71, 85))
+        cspc_re_x_not_conservativ = np.zeros((71, 85))
 
-    return subset_ok, flagKcorrupted, cspcReX, cspcImX, cspc_re, ks1, ths1, kx, ky, cspcReX_not_conservativ, S
+    return subset_ok, flag_kcorrupted, cspc_re_x, cspc_im_x, cspc_re, ks1, ths1, kx, ky, cspc_re_x_not_conservativ, S
 
 
 def _conv_time(in_t):

@@ -1,5 +1,3 @@
-import sys
-
 import numpy as np
 import xarray
 
@@ -17,11 +15,11 @@ def prepare_ocn_wv_data(pattern_path, log):
     ocn_wv_ds = xarray.open_mfdataset(pattern_path, combine='by_coords', concat_dim='time', preprocess=preproc_ocn_wv)
     log.info('Nb pts in dataset: %s' % ocn_wv_ds['todSAR'].size)
     log.info('SAR data ready to be used')
-    cspcRe = ocn_wv_ds['oswQualityCrossSpectraRe'].values
-    cspcIm = ocn_wv_ds['oswQualityCrossSpectraIm'].values
+    cspc_re = ocn_wv_ds['oswQualityCrossSpectraRe'].values
+    cspc_im = ocn_wv_ds['oswQualityCrossSpectraIm'].values
 
-    re = preprocess.conv_real(cspcRe)
-    im = preprocess.conv_imaginary(cspcIm)
+    re = preprocess.conv_real(cspc_re)
+    im = preprocess.conv_imaginary(cspc_im)
     spectrum = np.stack((re, im), axis=3)
     return spectrum, ocn_wv_ds
 
@@ -61,6 +59,7 @@ def main_level_1(pattern_path, model, log):
     """
     :param pattern_path: (str) or list of str path
     :param model:
+    :param log:
     :return:
     """
     spectrum, s1_ocn_wv_ds = prepare_ocn_wv_data(pattern_path, log)

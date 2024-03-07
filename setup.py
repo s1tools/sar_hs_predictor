@@ -2,11 +2,11 @@
 
 from setuptools import setup, find_packages
 
-version = '3.8.0dev'
+version = '1.0.0'
 
 setup(name='sar_hs_predictor',
       python_requires=">=3.9",
-      namespace_packages = ["s1tools"],
+      namespace_packages=["s1tools"],
       version=version,
       description="",
       long_description="""\
