@@ -246,7 +246,7 @@ def get_OCN_SAR_date(measurement_file_path) -> xr.Dataset:
     """
     basename = os.path.basename(measurement_file_path)
     datesar64 = np.datetime64(
-        datetime.strptime(basename.split("-")[5], "%Y%m%dt%H%M%S")
+        datetime.datetime.strptime(basename.split("-")[5], "%Y%m%dt%H%M%S")
     )
     dssar = xr.open_dataset(measurement_file_path)
     dssar = dssar.assign(
@@ -321,7 +321,8 @@ def get_Hs_inference_from_CartesianXspectra(measurement_file_path)->xr.Dataset:
     :return:
     """
     ds_one_wv_imagette = get_OCN_SAR_date(measurement_file_path)
-    cw = ds_one_wv_imagette["NEWcwave"].values.reshape(ds_one_wv_imagette["NEWcwave"].values.shape[0],20)
+    logging.debug('cwave: %s',ds_one_wv_imagette["NEWcwave"])
+    cw = ds_one_wv_imagette["NEWcwave"].values.reshape((20,))
 
     ds_one_wv_imagette_normed = apply_normalisation(ds_wv_ocn=ds_one_wv_imagette)
     # create numpy vectors expected as input of the architecture NN model
@@ -336,27 +337,36 @@ def get_Hs_inference_from_CartesianXspectra(measurement_file_path)->xr.Dataset:
             ]
         ).T
     x_hlf = np.hstack([x_hlf, cw])
+    x_hlf = x_hlf.reshape((1,x_hlf.size))
+    logging.debug('x_hlf: %s',x_hlf.shape)
     x_spec =  ds_one_wv_imagette_normed["oswCartSpecRe"].values
+    x_spec = x_spec.reshape((1,x_spec.shape[0],x_spec.shape[1]))
+    logging.debug('x_spec: %s',x_spec.shape)
     # y_test = dstest["hs_alti_closest"].values
     targets = np.ones(len(x_hlf))*np.NaN # for predictions having the Hs from altimeters is not mandatory
+    targets = targets.reshape((1,targets.size))
+    logging.debug('targets: %s',targets.shape)
     data_wv = DataGenerator(x_hlf=x_hlf,
                                         x_spectra=x_spec, y_set=targets, batch_size=128)
-    if periods['before_WV2_update'][0]>=ds_one_wv_imagette['sardate'] and periods[''][1]<ds_one_wv_imagette['sardate']:
+    logging.debug('sardate: %s',ds_one_wv_imagette['sardate'])
+    if np.datetime64(periods['before_WV2_update'][0])>=ds_one_wv_imagette['sardate'] and np.datetime64(periods[''][1]<ds_one_wv_imagette['sardate']):
         sat_acronym = os.path.basename(measurement_file_path).split('-')[0].upper() # S1A or S1B or ..
-        if test_periods[sat_acronym][0]>=ds_one_wv_imagette['sardate'] and test_periods[sat_acronym][1]<ds_one_wv_imagette['sardate']:
+        if np.datetime64(test_periods[sat_acronym][0])>=ds_one_wv_imagette['sardate'] and np.datetime64(test_periods[sat_acronym][1])<ds_one_wv_imagette['sardate']:
             tag = 'hs_wv_model_after_WV2_EAP'
         else:
             tag = 'hs_wv_model_before_WV2_EAP'
 
     else:
         tag = 'hs_wv_model_after_WV2_EAP'
+    logging.debug('tag : %s',tag)
     model_wv = load_wv_model(model_tag=tag)
-    yhat = model_wv.predict(data_wv) # 2 columns Hs and HsStdev
+    yhat = model_wv.predict(data_wv)[0] # 2 columns Hs and HsStdev
+    logging.debug('yhat : %s',yhat)
     # optional part to declare the variable in OSW component
     ds = xr.Dataset()
-    ds['oswTotalHs'] = xr.DataArray(name='oswTotalHs',data=[yhat[0]],dims=['oswRaSize','oswAzSize'],
+    ds['oswTotalHs'] = xr.DataArray(name='oswTotalHs',data=np.array([yhat[0]]).reshape(1,1),dims=['oswRaSize','oswAzSize'],
         attrs={'long_name':"Total significant wave height"})
-    ds['oswTotalHsStdev'] = xr.DataArray(name='oswTotalHsStdev',data=[yhat[1]],dims=['oswRaSize','oswAzSize'],
+    ds['oswTotalHsStdev'] = xr.DataArray(name='oswTotalHsStdev',data=np.array([yhat[1]]).reshape(1,1),dims=['oswRaSize','oswAzSize'],
         attrs={'long_name':"Standard deviation of total significant wave height"})
     return ds
 
