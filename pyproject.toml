@@ -1,0 +1,72 @@
+[project]
+name = "s1tools"
+requires-python = ">= 3.10"
+license = {text = "MIT"}
+description = "Python library to perform prediction of altimeter-like Significant Wave Height using Sentinel-1 OCN Level-2 product as input."
+readme = "README.md"
+dependencies = [
+  "python-dateutil",
+  "xarray",
+  "numpy",
+]
+keywords = [
+  "xarray",
+  "earth-observation",
+  "remote-sensing",
+  "satellite-imagery",
+  "sentinel1",
+  "sar",
+  "synthetic-aperture-radar",
+  "wave",
+  "hs",
+  "swh"
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering",
+]
+dynamic = ["version"]
+
+[project.urls]
+homepage = "https://github.com/s1tools/sar_hs_predictor.readthedocs.io"
+documentation = "https://github.com/s1tools/sar_hs_predictor.readthedocs.io"
+repository = "https://github.com/s1tools/sar_hs_predictor"
+changelog = "https://github.com/s1tools/sar_hs_predictor.readthedocs.io/en/latest/changelog.html"
+
+[project.scripts]
+test-hs-wv-prediction = "s1tools.sarhspredictor.predict_Hs_from_WV_ocn_cartesianXspec:test_a_prediction_wv"
+
+[build-system]
+requires = ["setuptools>=64.0", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["s1tools"]
+
+[tool.setuptools_scm]
+fallback_version = "999"
+
+[tool.isort]
+profile = "black"
+skip_gitignore = true
+float_to_top = true
+default_section = "THIRDPARTY"
+known_first_party = "s1tools"
+
+[tool.black]
+line-length = 100
+
+[tool.coverage.run]
+source = ["s1tools"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING"]

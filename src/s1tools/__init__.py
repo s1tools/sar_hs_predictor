@@ -1,1 +1,5 @@
-__import__('pkg_resources').declare_namespace(__name__)
+from importlib.metadata import version
+try:
+    __version__ = version("s1tools")
+except Exception:
+    __version__ = "999"
