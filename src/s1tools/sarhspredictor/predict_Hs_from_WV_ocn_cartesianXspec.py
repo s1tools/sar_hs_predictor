@@ -343,7 +343,7 @@ def get_Hs_inference_from_CartesianXspectra(measurement_file_path)->xr.Dataset:
     x_spec = x_spec.reshape((1,x_spec.shape[0],x_spec.shape[1]))
     logging.debug('x_spec: %s',x_spec.shape)
     # y_test = dstest["hs_alti_closest"].values
-    targets = np.ones(len(x_hlf))*np.NaN # for predictions having the Hs from altimeters is not mandatory
+    targets = np.ones(len(x_hlf))*np.nan # for predictions having the Hs from altimeters is not mandatory
     targets = targets.reshape((1,targets.size))
     logging.debug('targets: %s',targets.shape)
     data_wv = DataGenerator(x_hlf=x_hlf,

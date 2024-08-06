@@ -6,7 +6,10 @@ description = "Python library to perform prediction of altimeter-like Significan
 readme = "README.md"
 dependencies = [
   "python-dateutil",
+  "tensorflow==2.15.0",
   "xarray",
+  "pyyaml",
+  "netcdf4",
   "numpy",
 ]
 keywords = [
