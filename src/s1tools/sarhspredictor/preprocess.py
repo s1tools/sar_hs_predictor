@@ -1,24 +1,24 @@
-
+from s1tools.sarhspredictor.constant import normalisation_factors
 def normIncidence(inc):
-    return inc / 38.0
+    return inc / normalisation_factors['incidence_angle']
 
 
 def normHeading(heading):
-    return heading / 360.0
+    return heading / normalisation_factors['heading_angle']
 
 
 def normAzCutOff(cutoff):
-    return cutoff / 800.0
+    return cutoff / normalisation_factors['azimuth_cutoff']
 
 
 def normCartSpecRe(spec):
     # assert spec.shape==(185,128)
-    return spec / 2000.0
+    return spec / normalisation_factors['oswCartSpecRe']
 
 
 def normCartSpecIm(spec):
     # assert spec.shape==(185,128)
-    return spec / 200.0
+    return spec / normalisation_factors['oswCartSpecIm']
 
 
 variables_2_norm = [
