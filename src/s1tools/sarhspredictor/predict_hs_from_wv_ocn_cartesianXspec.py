@@ -4,7 +4,7 @@ import xarray as xr
 import os
 import datetime
 from s1tools.sarhspredictor.generator import DataGenerator
-from s1tools.sarhspredictor.load_Hs_WV_keras_model import load_wv_model
+from s1tools.sarhspredictor.load_hs_wv_keras_model import load_wv_model
 from s1tools.sarhspredictor.preprocess import apply_normalisation
 periods = {'before_WV2_update': (datetime.datetime(2019, 6, 27), # start of release IPF003.10 Optimized resampling of image cartesian cross-spectra
             datetime.datetime(2021, 6, 25)),

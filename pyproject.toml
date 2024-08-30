@@ -1,17 +1,19 @@
 [project]
 name = "s1tools"
-requires-python = ">= 3.10"
+requires-python = ">= 3.9"
 license = {text = "MIT"}
 description = "Python library to perform prediction of altimeter-like Significant Wave Height using Sentinel-1 OCN Level-2 product as input."
 readme = "README.md"
 dependencies = [
   "python-dateutil",
-  "tensorflow==2.15.0",
+  "tensorflow",
   "xarray",
   "pyyaml",
   "netcdf4",
   "numpy",
 ]
+# to match ESA IPF restrictions, successful predictions have been tested with following versions
+# micromamba install numpy==1.19.5 xarray==2022.03 pandas==1.4.4 scipy==1.6.0 tensorflow==2.7.0
 keywords = [
   "xarray",
   "earth-observation",

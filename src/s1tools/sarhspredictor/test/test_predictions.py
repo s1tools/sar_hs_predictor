@@ -2,7 +2,7 @@ import pytest
 import os
 import pickle
 import s1tools
-from s1tools.sarhspredictor.load_Hs_WV_keras_model import load_wv_model
+from s1tools.sarhspredictor.load_hs_wv_keras_model import load_wv_model
 import numpy as np
 from s1tools.sarhspredictor import generator
 def test_hs_predictions_before_WV2_EAP():
