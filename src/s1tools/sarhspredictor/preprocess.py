@@ -1,29 +1,31 @@
 from s1tools.sarhspredictor.constant import normalisation_factors
+
+
 def normIncidence(inc):
-    return inc / normalisation_factors['incidence_angle']
+    return inc / normalisation_factors["incidence_angle"]
 
 
 def normHeading(heading):
-    return heading / normalisation_factors['heading_angle']
+    return heading / normalisation_factors["heading_angle"]
 
 
 def normAzCutOff(cutoff):
-    return cutoff / normalisation_factors['azimuth_cutoff']
+    return cutoff / normalisation_factors["azimuth_cutoff"]
 
 
 def normCartSpecRe(spec):
     # assert spec.shape==(185,128)
-    return spec / normalisation_factors['oswCartSpecRe']
+    return spec / normalisation_factors["oswCartSpecRe"]
 
 
 def normCartSpecIm(spec):
     # assert spec.shape==(185,128)
-    return spec / normalisation_factors['oswCartSpecIm']
+    return spec / normalisation_factors["oswCartSpecIm"]
 
 
 variables_2_norm = [
     "oswCartSpecRe",
-    #"oswCartSpecIm", # useless after tests
+    # "oswCartSpecIm", # useless after tests
     # "oswNrcs", # already quite packed -20dB to 0dB
     "oswAzCutoff",
     # "oswNv", # already quite packed -20dB to 0dB
@@ -31,6 +33,7 @@ variables_2_norm = [
     "oswIncidenceAngle",
     # "NEWcwave", # already quite packed -20dB to 0dB
 ]
+
 
 def apply_normalisation(ds_wv_ocn):
     """
