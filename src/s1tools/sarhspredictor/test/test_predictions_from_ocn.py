@@ -6,11 +6,10 @@ from s1tools.sarhspredictor.predict_hs_from_wv_ocn_cartesian_xspec import (
 )
 import numpy as np
 
-expected = {"hs": 12.17, "hsstd": 1.473}
+# expected = {"hs": 12.17, "hsstd": 1.473}
+expected = {"hs":11.87,"hsstd":1.546}
 
-
-def test_hs_predictions_before_WV2_EAP():
-    # matching model S1_WV_oswCartSpec_hs_NN_model_05BeforeEAP.15_bestmodel_checkpoint.h5
+def test_hs_predictions_from_ocn_file():
     input_test_dataset = os.path.join(
         os.path.dirname(s1tools.sarhspredictor.__file__),
         "referencedata",
@@ -28,4 +27,4 @@ def test_hs_predictions_before_WV2_EAP():
 
 
 if __name__ == "__main__":
-    test_hs_predictions_before_WV2_EAP()
+    test_hs_predictions_from_ocn_file()

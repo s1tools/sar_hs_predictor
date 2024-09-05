@@ -8,7 +8,6 @@ from s1tools.sarhspredictor import generator
 
 
 def test_hs_predictions_before_WV2_EAP():
-    # matching model S1_WV_oswCartSpec_hs_NN_model_05BeforeEAP.15_bestmodel_checkpoint.h5
     input_test_dataset = os.path.join(
         os.path.dirname(s1tools.sarhspredictor.__file__),
         "referencedata",
@@ -33,7 +32,6 @@ def test_hs_predictions_before_WV2_EAP():
 
 
 def test_hs_predictions_after_WV2_EAP():
-    # matching model S1_WV_oswCartSpec_hs_NN_model_05.12_bestmodel_checkpoint.h5
     input_test_dataset = os.path.join(
         os.path.dirname(s1tools.sarhspredictor.__file__),
         "referencedata",
