@@ -15,3 +15,21 @@ pip install .
 if one want to test other keras models, a `localconfig.yaml` can be created to superseed the default `config.yaml` file.
 
 
+## Performances of trained models
+
+The figures below are generated using the test datasets.
+### Period after WV2 Elevation Antenna Pattern update ( 26 June 2021 - March 2024)
+
+![scatter after](./docs/images/scatter_hs_run5.36.png)
+
+![table after](./docs/images/table_hs_test_run5.36.png)
+
+![scatter hs STD after](./docs/images/hs_std_vs_hs_bias_run5.36.png)
+
+### Period before WV2 Elevation Antenna Pattern update ( 27 June 2019 - 25 June 2021)
+
+![scatter before](./docs/images/scatter_hs_run5.35.png)
+
+![table before](./docs/images/table_hs_test_run5.35.png)
+
+![scatter hs STD before](./docs/images/hs_std_vs_hs_bias_run5.35.png)
