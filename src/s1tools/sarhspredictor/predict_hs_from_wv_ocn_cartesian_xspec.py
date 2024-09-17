@@ -309,7 +309,7 @@ def get_OCN_SAR_date(measurement_file_path) -> xr.Dataset:
     return dssar
 
 
-def get_Hs_inference_from_CartesianXspectra(measurement_file_path) -> xr.Dataset:
+def get_hs_inference_from_cartesian_xspectra(measurement_file_path) -> xr.Dataset:
     """
     this method would start from a ocn wv measurement path to get the 2 variables to be added to OSW OCN component
 
@@ -404,7 +404,7 @@ def test_a_prediction_wv():
         logging.basicConfig(level=logging.INFO, format=fmt, datefmt="%d/%m/%Y %H:%M:%S", force=True)
     t0 = time.time()
 
-    ds_hs_wv = get_Hs_inference_from_CartesianXspectra(measurement_file_path=args.wvpath)
+    ds_hs_wv = get_hs_inference_from_cartesian_xspectra(measurement_file_path=args.wvpath)
     logging.info("ds_hs_wv : %s", ds_hs_wv)
 
     logging.info("done in %1.3f min", (time.time() - t0) / 60.0)

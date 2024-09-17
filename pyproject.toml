@@ -1,5 +1,5 @@
 [project]
-name = "s1tools"
+name = "sar_hs_predictor"
 requires-python = ">= 3.9"
 license = {text = "MIT"}
 description = "Python library to perform prediction of altimeter-like Significant Wave Height using Sentinel-1 OCN Level-2 product as input."
@@ -46,7 +46,7 @@ repository = "https://github.com/s1tools/sar_hs_predictor"
 changelog = "https://github.com/s1tools/sar_hs_predictor.readthedocs.io/en/latest/changelog.html"
 
 [project.scripts]
-test-hs-wv-prediction = "s1tools.sarhspredictor.predict_Hs_from_WV_ocn_cartesianXspec:test_a_prediction_wv"
+test-hs-wv-prediction = "s1tools.sarhspredictor.predict_hs_from_WV_ocn_cartesian_xspec:test_a_prediction_wv"
 
 [build-system]
 requires = ["setuptools>=64.0", "setuptools-scm"]
