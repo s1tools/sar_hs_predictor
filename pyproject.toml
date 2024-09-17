@@ -46,7 +46,7 @@ repository = "https://github.com/s1tools/sar_hs_predictor"
 changelog = "https://github.com/s1tools/sar_hs_predictor.readthedocs.io/en/latest/changelog.html"
 
 [project.scripts]
-test-hs-wv-prediction = "s1tools.sarhspredictor.predict_hs_from_WV_ocn_cartesian_xspec:test_a_prediction_wv"
+test-hs-wv-prediction = "s1tools.sarhspredictor.predict_hs_from_wv_ocn_cartesian_xspec:test_a_prediction_wv"
 
 [build-system]
 requires = ["setuptools>=64.0", "setuptools-scm"]
