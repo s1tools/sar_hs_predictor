@@ -2,7 +2,7 @@ import pytest
 import os
 import s1tools
 from s1tools.sarhspredictor.predict_hs_from_wv_ocn_cartesian_xspec import (
-    get_Hs_inference_from_CartesianXspectra,
+    get_hs_inference_from_cartesian_xspectra,
 )
 import numpy as np
 
@@ -17,7 +17,7 @@ def test_hs_predictions_from_ocn_file():
         "measurement",
         "s1a-wv2-ocn-vv-20231003t122403-20231003t122406-050600-061886-006.nc",
     )
-    actual_ds_hs_predictions = get_Hs_inference_from_CartesianXspectra(input_test_dataset)
+    actual_ds_hs_predictions = get_hs_inference_from_cartesian_xspectra(input_test_dataset)
     print("ds_hs_predictions", actual_ds_hs_predictions)
     # expected_predictions = data['yhat']
     # test Hs

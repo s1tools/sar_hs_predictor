@@ -23,38 +23,24 @@ def normCartSpecIm(spec):
     return spec / normalisation_factors["oswCartSpecIm"]
 
 
-variables_2_norm = [
-    "oswCartSpecRe",
-    # "oswCartSpecIm", # useless after tests
-    # "oswNrcs", # already quite packed -20dB to 0dB
-    "oswAzCutoff",
-    # "oswNv", # already quite packed -20dB to 0dB
-    "oswHeading",
-    "oswIncidenceAngle",
-    # "NEWcwave", # already quite packed -20dB to 0dB
-]
-
-
 def apply_normalisation(ds_wv_ocn):
     """
 
     :param ds_wv_ocn: xr.Dataset for one WV imagette
     :return:
     """
-    for ii in range(len(variables_2_norm)):
-        variable = variables_2_norm[ii]
+    variable_norm = {
+        "oswIncidenceAngle": normIncidence,
+        "oswHeading": normHeading,
+        "oswAzCutoff": normAzCutOff,
+        "oswCartSpecRe": normCartSpecRe,
+        # "oswCartSpecIm", # useless after tests
+        # "oswNrcs", # already quite packed -20dB to 0dB
+        # "oswNv", # already quite packed -20dB to 0dB
+        # "NEWcwave", # already quite packed -20dB to 0dB
+   }
+
+    for variable, norm in variable_norm.items():
         da = ds_wv_ocn[variable]
-        if variable == "oswIncidenceAngle":
-            valuess2 = normIncidence(da)
-        elif variable == "oswHeading":
-            valuess2 = normHeading(da)
-        elif variable == "oswAzCutoff":
-            valuess2 = normAzCutOff(da)
-        elif variable == "oswCartSpecRe":
-            valuess2 = normCartSpecRe(da)
-        elif variable == "oswCartSpecIm":
-            valuess2 = normCartSpecIm(da)
-        else:
-            raise Exception("variable: %s not expected" % variable)
-        ds_wv_ocn = ds_wv_ocn.assign({variable: valuess2})
+        ds_wv_ocn = ds_wv_ocn.assign({variable: norm(da)})
     return ds_wv_ocn

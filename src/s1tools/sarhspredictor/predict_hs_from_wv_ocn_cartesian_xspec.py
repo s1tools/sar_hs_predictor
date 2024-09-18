@@ -9,18 +9,21 @@ from s1tools.sarhspredictor.preprocess import apply_normalisation
 
 periods = {
     "before_WV2_update": (
-        datetime.datetime(
-            2019, 6, 27
-        ),  # start of release IPF003.10 Optimized resampling of image cartesian cross-spectra
-        datetime.datetime(2021, 6, 25),
+        np.datetime64(datetime.datetime(2019, 6, 27)),
+        # start of release IPF003.10 Optimized resampling of image cartesian cross-spectra
+        np.datetime64(datetime.datetime(2021, 6, 25)),
     ),
-    "after_WV2_update": (datetime.datetime(2021, 6, 26), datetime.datetime.today()),
+    "after_WV2_update": (
+        np.datetime64(datetime.datetime(2021, 6, 26)),
+        np.datetime64(datetime.datetime.today())),
 }  # D-1 new EAP WV2 definitively adopted both S1A and S1B}
-# S1A with new WV2 beam elevation antenna pattern EAP   28/02/2019  12/03/2019  EAP WV2 test
+# S1A with new WV2 beam elevation antenna pattern EAP 28/02/2019  12/03/2019  EAP WV2 test
 # S1B with new WV2 beam elevation antenna pattern EAP 14/05/2019  28/05/2019  EAP WV2 test
 test_periods = {
-    "S1A": (datetime.datetime(2019, 2, 28), datetime.datetime(2019, 3, 12)),
-    "S1B": (datetime.datetime(2019, 5, 14), datetime.datetime(2019, 5, 28)),
+    "S1A": (np.datetime64(datetime.datetime(2019, 2, 28)),
+            np.datetime64(datetime.datetime(2019, 3, 12))),
+    "S1B": (np.datetime64(datetime.datetime(2019, 5, 14)),
+            np.datetime64(datetime.datetime(2019, 5, 28))),
 }
 
 
@@ -309,7 +312,7 @@ def get_OCN_SAR_date(measurement_file_path) -> xr.Dataset:
     return dssar
 
 
-def get_Hs_inference_from_CartesianXspectra(measurement_file_path) -> xr.Dataset:
+def get_hs_inference_from_cartesian_xspectra(measurement_file_path) -> xr.Dataset:
     """
     this method would start from a ocn wv measurement path to get the 2 variables to be added to OSW OCN component
 
@@ -339,29 +342,22 @@ def get_Hs_inference_from_CartesianXspectra(measurement_file_path) -> xr.Dataset
     x_spec = x_spec.reshape((1, x_spec.shape[0], x_spec.shape[1]))
     logging.debug("x_spec: %s", x_spec.shape)
     # y_test = dstest["hs_alti_closest"].values
-    targets = (
-        np.ones(len(x_hlf)) * np.nan
-    )  # for predictions having the Hs from altimeters is not mandatory
+
+    # for predictions having the Hs from altimeters is not mandatory
+    targets = np.ones(len(x_hlf)) * np.nan
     targets = targets.reshape((1, targets.size))
     logging.debug("targets: %s", targets.shape)
     data_wv = DataGenerator(x_hlf=x_hlf, x_spectra=x_spec, y_set=targets, batch_size=128)
-    logging.debug("sardate: %s", ds_one_wv_imagette["sardate"])
-    if np.datetime64(periods["before_WV2_update"][0]) >= ds_one_wv_imagette[
-        "sardate"
-    ] and np.datetime64(periods[""][1] < ds_one_wv_imagette["sardate"]):
-        sat_acronym = (
-            os.path.basename(measurement_file_path).split("-")[0].upper()
-        )  # S1A or S1B or ..
-        if (
-            np.datetime64(test_periods[sat_acronym][0]) >= ds_one_wv_imagette["sardate"]
-            and np.datetime64(test_periods[sat_acronym][1]) < ds_one_wv_imagette["sardate"]
-        ):
+    sardate = ds_one_wv_imagette["sardate"]
+    logging.debug("sardate: %s", sardate)
+    tag = "hs_wv_model_after_WV2_EAP"
+    if periods["before_WV2_update"][0] >= sardate and periods[""][1] < sardate:
+        sat_acronym = os.path.basename(measurement_file_path).split("-")[0].upper()  # S1A or S1B or ..
+        start = test_periods[sat_acronym][0]
+        stop = test_periods[sat_acronym][1]
+        if start < sardate or stop >= sardate:
             tag = "hs_wv_model_after_WV2_EAP"
-        else:
-            tag = "hs_wv_model_before_WV2_EAP"
 
-    else:
-        tag = "hs_wv_model_after_WV2_EAP"
     logging.debug("tag : %s", tag)
     model_wv = load_wv_model(model_tag=tag)
     yhat = model_wv.predict(data_wv)[0]  # 2 columns Hs and HsStdev
@@ -398,13 +394,19 @@ def test_a_prediction_wv():
     fmt = "%(asctime)s %(levelname)s %(filename)s(%(lineno)d) %(message)s"
     if args.verbose:
         logging.basicConfig(
-            level=logging.DEBUG, format=fmt, datefmt="%d/%m/%Y %H:%M:%S", force=True
-        )
+            level=logging.DEBUG,
+            format=fmt,
+            datefmt="%d/%m/%Y %H:%M:%S",
+            force=True)
     else:
-        logging.basicConfig(level=logging.INFO, format=fmt, datefmt="%d/%m/%Y %H:%M:%S", force=True)
+        logging.basicConfig(
+            level=logging.INFO,
+            format=fmt,
+            datefmt="%d/%m/%Y %H:%M:%S",
+            force=True)
     t0 = time.time()
 
-    ds_hs_wv = get_Hs_inference_from_CartesianXspectra(measurement_file_path=args.wvpath)
+    ds_hs_wv = get_hs_inference_from_cartesian_xspectra(measurement_file_path=args.wvpath)
     logging.info("ds_hs_wv : %s", ds_hs_wv)
 
     logging.info("done in %1.3f min", (time.time() - t0) / 60.0)
