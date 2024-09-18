@@ -4,24 +4,22 @@ import yaml
 import s1tools
 
 
-def load_config():
+def load_config(config_path=None):
     """
 
     Returns:
         conf: dict
     """
-    local_config_path = os.path.join(
-        os.path.dirname(s1tools.__file__), "sarhspredictor", "localconfig.yaml"
-    )
-
-    if os.path.exists(local_config_path):
-        config_path = local_config_path
-    else:
+    if config_path is None:
         config_path = os.path.join(
-            os.path.dirname(s1tools.__file__), "sarhspredictor", "config.yaml"
-        )
+            os.path.dirname(s1tools.__file__),
+            "sarhspredictor",
+            "config.yaml"
+            )
+
+        config_path = os.environ.get('SAR_HS_PREDICTOR_CONFIG_YAML_PATH', config_path)
 
     logging.info("config path: %s", config_path)
     stream = open(config_path, "r")
     conf = yaml.load(stream, Loader=yaml.CLoader)
-    return conf
+    return conf, config_path
