@@ -1,0 +1,2 @@
+hs_wv_model_before_WV2_EAP: "./models/S1_WV_oswCartSpec_hs_NN_model_05BeforeEAP.35_bestmodel_checkpoint_30_val_loss_0.258.h5"
+hs_wv_model_after_WV2_EAP: "./models/S1_WV_oswCartSpec_hs_NN_model_05AfterEAP.36_bestmodel_checkpoint_37_val_loss_0.223.h5"

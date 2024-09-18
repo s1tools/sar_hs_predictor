@@ -1,0 +1,78 @@
+[project]
+name = "sar_hs_predictor"
+requires-python = ">= 3.9"
+license = {text = "MIT"}
+description = "Python library to perform prediction of altimeter-like Significant Wave Height using Sentinel-1 OCN Level-2 product as input."
+readme = "README.md"
+dependencies = [
+  "python-dateutil",
+  "tensorflow",
+  "xarray",
+  "pyyaml",
+  "netcdf4",
+  "numpy",
+]
+# to match ESA IPF restrictions, successful predictions have been tested with following versions
+# micromamba install numpy==1.19.5 xarray==2022.03 pandas==1.4.4 scipy==1.6.0 tensorflow==2.7.0
+keywords = [
+  "xarray",
+  "earth-observation",
+  "remote-sensing",
+  "satellite-imagery",
+  "sentinel1",
+  "sar",
+  "synthetic-aperture-radar",
+  "wave",
+  "hs",
+  "swh"
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering",
+]
+dynamic = ["version"]
+
+[project.urls]
+homepage = "https://github.com/s1tools/sar_hs_predictor.readthedocs.io"
+documentation = "https://github.com/s1tools/sar_hs_predictor.readthedocs.io"
+repository = "https://github.com/s1tools/sar_hs_predictor"
+changelog = "https://github.com/s1tools/sar_hs_predictor.readthedocs.io/en/latest/changelog.html"
+
+[project.scripts]
+test-hs-wv-prediction = "s1tools.sarhspredictor.predict_hs_from_wv_ocn_cartesian_xspec:test_a_prediction_wv"
+
+[build-system]
+requires = ["setuptools>=64.0", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["s1tools"]
+package-dir = {"" = "src"}
+
+[tool.setuptools_scm]
+fallback_version = "999"
+
+[tool.isort]
+profile = "black"
+skip_gitignore = true
+float_to_top = true
+default_section = "THIRDPARTY"
+known_first_party = "s1tools"
+
+[tool.black]
+line-length = 100
+
+[tool.coverage.run]
+source = ["s1tools"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING"]
