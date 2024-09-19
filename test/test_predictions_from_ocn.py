@@ -9,15 +9,21 @@ import numpy as np
 # expected = {"hs": 12.17, "hsstd": 1.473}
 expected = {"hs":11.87,"hsstd":1.546}
 
+
 def test_hs_predictions_from_ocn_file():
     input_test_dataset = os.path.join(
-        os.path.dirname(s1tools.sarhspredictor.__file__),
+        os.path.dirname(__file__),
         "referencedata",
         "S1A_WV_OCN__2SSV_20231003T122250_20231003T124111_050600_061886_3197.SAFE",
         "measurement",
         "s1a-wv2-ocn-vv-20231003t122403-20231003t122406-050600-061886-006.nc",
     )
-    actual_ds_hs_predictions = get_hs_inference_from_cartesian_xspectra(input_test_dataset)
+    config_path = os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "config.yaml",
+    )
+    actual_ds_hs_predictions = get_hs_inference_from_cartesian_xspectra(input_test_dataset, config_path=config_path)
     print("ds_hs_predictions", actual_ds_hs_predictions)
     # expected_predictions = data['yhat']
     # test Hs

@@ -12,8 +12,8 @@ def load_config(config_path=None):
     """
     if config_path is None:
         config_path = os.path.join(
-            os.path.dirname(s1tools.__file__),
-            "sarhspredictor",
+            os.path.dirname(__file__),
+            ".."," ..", ".."
             "config.yaml"
             )
 

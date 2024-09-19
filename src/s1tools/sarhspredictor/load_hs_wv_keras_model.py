@@ -16,6 +16,6 @@ def load_wv_model(model_tag="hs_wv_model_before_WV2_EAP", config_path=None) -> t
         modelNN : tensorflow.keras.models
     """
     config, config_path = load_config(config_path)
-    path_model = os.path.abspath(os.path.join(config_path, config[model_tag]))
+    path_model = os.path.abspath(os.path.join(os.path.dirname(config_path), config[model_tag]))
     modelNN = load_model(path_model, custom_objects=custom_objects)
     return modelNN

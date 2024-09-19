@@ -312,9 +312,9 @@ def get_OCN_SAR_date(measurement_file_path) -> xr.Dataset:
     return dssar
 
 
-def get_hs_inference_from_cartesian_xspectra(measurement_file_path) -> xr.Dataset:
+def get_hs_inference_from_cartesian_xspectra(measurement_file_path, config_path=None) -> xr.Dataset:
     """
-    this method would start from a ocn wv measurement path to get the 2 variables to be added to OSW OCN component
+    this method would start from an ocn wv measurement path to get the 2 variables to be added to OSW OCN component
 
     :param measurement_file_path: str full path S1 ocn wv measurement path
     :return:
@@ -359,7 +359,7 @@ def get_hs_inference_from_cartesian_xspectra(measurement_file_path) -> xr.Datase
             tag = "hs_wv_model_after_WV2_EAP"
 
     logging.debug("tag : %s", tag)
-    model_wv = load_wv_model(model_tag=tag)
+    model_wv = load_wv_model(model_tag=tag, config_path=config_path)
     yhat = model_wv.predict(data_wv)[0]  # 2 columns Hs and HsStdev
     logging.debug("yhat : %s", yhat)
     # optional part to declare the variable in OSW component
@@ -385,6 +385,7 @@ def test_a_prediction_wv():
     parser = argparse.ArgumentParser(description="Hs-WV-inference")
     parser.add_argument("--verbose", action="store_true", default=False)
     parser.add_argument("--wvpath", required=True, help="S1 WV OCN full path")
+    parser.add_argument("--config_path", required=True, help="model config file full path")
     parser.add_argument(
         "--version",
         action="version",
@@ -406,7 +407,7 @@ def test_a_prediction_wv():
             force=True)
     t0 = time.time()
 
-    ds_hs_wv = get_hs_inference_from_cartesian_xspectra(measurement_file_path=args.wvpath)
+    ds_hs_wv = get_hs_inference_from_cartesian_xspectra(measurement_file_path=args.wvpath, config_path=args.config_path)
     logging.info("ds_hs_wv : %s", ds_hs_wv)
 
     logging.info("done in %1.3f min", (time.time() - t0) / 60.0)
