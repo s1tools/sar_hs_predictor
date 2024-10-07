@@ -379,6 +379,65 @@ def get_hs_inference_from_cartesian_xspectra(measurement_file_path, config_path=
     return ds
 
 
+def ipf_get_hs_inference_from_cartesian_xspectra(measurement_file_path, path_model) -> xr.Dataset:
+    """
+    this method would start from an ocn wv measurement path to get the 2 variables to be added to OSW OCN component
+
+    :param measurement_file_path: str full path S1 ocn wv measurement path
+    :param path_model: str full path of the model
+
+    :return:
+    """
+    ds_one_wv_imagette = get_OCN_SAR_date(measurement_file_path)
+    logging.debug("cwave: %s", ds_one_wv_imagette["NEWcwave"])
+    cw = ds_one_wv_imagette["NEWcwave"].values.reshape((20,))
+
+    ds_one_wv_imagette_normed = apply_normalisation(ds_wv_ocn=ds_one_wv_imagette)
+    # create numpy vectors expected as input of the architecture NN model
+    x_hlf = np.stack(
+        [
+            ds_one_wv_imagette_normed["oswNrcs"].values,
+            ds_one_wv_imagette_normed["oswNv"].values,
+            ds_one_wv_imagette_normed["oswIncidenceAngle"].values,
+            ds_one_wv_imagette_normed["oswHeading"].values,
+            ds_one_wv_imagette_normed["oswSkew"].values,
+            ds_one_wv_imagette_normed["oswKurt"].values,
+        ]
+    ).T
+    x_hlf = np.hstack([x_hlf, cw])
+    x_hlf = x_hlf.reshape((1, x_hlf.size))
+    logging.debug("x_hlf: %s", x_hlf.shape)
+    x_spec = ds_one_wv_imagette_normed["oswCartSpecRe"].values
+    x_spec = x_spec.reshape((1, x_spec.shape[0], x_spec.shape[1]))
+    logging.debug("x_spec: %s", x_spec.shape)
+    # y_test = dstest["hs_alti_closest"].values
+
+    # for predictions having the Hs from altimeters is not mandatory
+    targets = np.ones(len(x_hlf)) * np.nan
+    targets = targets.reshape((1, targets.size))
+    logging.debug("targets: %s", targets.shape)
+    data_wv = DataGenerator(x_hlf=x_hlf, x_spectra=x_spec, y_set=targets, batch_size=128)
+
+    model_wv = load_wv_model(model_tag=None, path_model=path_model)
+    yhat = model_wv.predict(data_wv)[0]  # 2 columns Hs and HsStdev
+    logging.debug("yhat : %s", yhat)
+    # optional part to declare the variable in OSW component
+    ds = xr.Dataset()
+    ds["oswTotalHs"] = xr.DataArray(
+        name="oswTotalHs",
+        data=np.array([yhat[0]]).reshape(1, 1),
+        dims=["oswRaSize", "oswAzSize"],
+        attrs={"long_name": "Total significant wave height"},
+    )
+    ds["oswTotalHsStdev"] = xr.DataArray(
+        name="oswTotalHsStdev",
+        data=np.array([yhat[1]]).reshape(1, 1),
+        dims=["oswRaSize", "oswAzSize"],
+        attrs={"long_name": "Standard deviation of total significant wave height"},
+    )
+    return ds
+
+
 def test_a_prediction_wv():
     import argparse, time, s1tools
 

@@ -8,14 +8,16 @@ import os
 import s1tools
 
 
-def load_wv_model(model_tag="hs_wv_model_before_WV2_EAP", config_path=None) -> tensorflow.keras.models:
+def load_wv_model(model_tag="hs_wv_model_before_WV2_EAP", config_path=None, path_model=None) -> tensorflow.keras.models:
     """
 
     :param model_tag: str hs_wv_model_before_WV2_EAP or hs_wv_model_after_WV2_EAP
     :return:
         modelNN : tensorflow.keras.models
     """
-    config, config_path = load_config(config_path)
-    path_model = os.path.abspath(os.path.join(os.path.dirname(config_path), config[model_tag]))
+    if model_tag is not None:
+        config, config_path = load_config(config_path)
+        path_model = os.path.abspath(os.path.join(os.path.dirname(config_path), config[model_tag]))
+    assert os.path.exists(path_model), f"No model available at {path_model}"
     modelNN = load_model(path_model, custom_objects=custom_objects)
     return modelNN
